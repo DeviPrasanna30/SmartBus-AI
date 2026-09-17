@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SmartBus AI - Live Tracking</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#f3f7fc;
+    color:#172033;
+}
+
+.header{
+    background:#fff;
+    padding:22px 7%;
+    border-bottom:1px solid #e5e9f0;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:800;
+    color:#1769e0;
+}
+
+.tagline{
+    font-size:13px;
+    color:#718096;
+    margin-top:4px;
+}
+
+.live-badge{
+    background:#e9f8ef;
+    color:#168447;
+    padding:9px 15px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:700;
+}
+
+.container{
+    width:86%;
+    max-width:1000px;
+    margin:30px auto 50px;
+}
+
+.card{
+    background:#fff;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 5px 22px rgba(31,45,61,.07);
+    margin-bottom:20px;
+}
+
+.bus-label{
+    font-size:13px;
+    color:#718096;
+    margin-bottom:7px;
+}
+
+.bus-number{
+    font-size:30px;
+    font-weight:800;
+    color:#1769e0;
+}
+
+.bus-type{
+    display:inline-block;
+    margin-left:10px;
+    padding:6px 10px;
+    background:#edf4ff;
+    color:#1769e0;
+    border-radius:8px;
+    font-size:11px;
+    font-weight:700;
+}
+
+.route{
+    margin-top:9px;
+    font-size:17px;
+    font-weight:600;
+}
+
+.schedule{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    gap:15px;
+    align-items:center;
+    margin-top:22px;
+}
+
+.schedule-box{
+    background:#f7f9fc;
+    padding:14px;
+    border-radius:12px;
+}
+
+.small-label{
+    font-size:11px;
+    color:#718096;
+    margin-bottom:5px;
+}
+
+.time{
+    font-size:17px;
+    font-weight:800;
+}
+
+.arrow{
+    font-size:22px;
+    color:#1769e0;
+}
+
+/* OCCUPANCY */
+
+.title{
+    font-size:20px;
+    font-weight:800;
+    margin-bottom:20px;
+}
+
+.occupancy-layout{
+    display:flex;
+    align-items:center;
+    gap:35px;
+}
+
+.circle{
+    width:140px;
+    height:140px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+}
+
+.circle-inner{
+    width:108px;
+    height:108px;
+    border-radius:50%;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+}
+
+.percent{
+    font-size:28px;
+    font-weight:800;
+}
+
+.occupied-text{
+    font-size:11px;
+    color:#718096;
+}
+
+.stats{
+    flex:1;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+}
+
+.stat{
+    background:#f7f9fc;
+    border-radius:12px;
+    padding:16px;
+}
+
+.stat-label{
+    font-size:12px;
+    color:#718096;
+    margin-bottom:6px;
+}
+
+.stat-value{
+    font-size:22px;
+    font-weight:800;
+}
+
+/* JOURNEY */
+
+.timeline{
+    position:relative;
+    padding:5px 0 5px;
+}
+
+.progress-line{
+    position:absolute;
+    left:14px;
+    top:16px;
+    width:4px;
+    height:0;
+    background:#1769e0;
+    border-radius:5px;
+    transition:height 12s linear;
+    z-index:1;
+}
+
+.moving-bus{
+    position:absolute;
+    left:-1px;
+    top:18px;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:#1769e0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:17px;
+    z-index:5;
+    box-shadow:0 4px 12px rgba(23,105,224,.3);
+    transition:top 12s linear;
+}
+
+.stop{
+    position:relative;
+    min-height:110px;
+    padding-left:52px;
+}
+
+.stop:last-child{
+    min-height:80px;
+}
+
+.dot{
+    position:absolute;
+    left:7px;
+    top:9px;
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:#d7dee8;
+    border:4px solid #fff;
+    box-shadow:0 0 0 2px #d7dee8;
+    z-index:3;
+}
+
+.stop.current .dot{
+    background:#1769e0;
+    box-shadow:0 0 0 3px #cfe1ff;
+}
+
+.stop.passed .dot{
+    background:#1769e0;
+    box-shadow:0 0 0 2px #1769e0;
+}
+
+.stop-name{
+    font-size:16px;
+    font-weight:700;
+}
+
+.stop-time{
+    margin-top:6px;
+    font-size:12px;
+    color:#66758a;
+    font-weight:600;
+}
+
+.stop-status{
+    display:inline-block;
+    margin-top:6px;
+    padding:5px 9px;
+    border-radius:12px;
+    background:#edf1f6;
+    color:#718096;
+    font-size:11px;
+    font-weight:700;
+}
+
+.stop.current .stop-status{
+    background:#e7f0ff;
+    color:#1769e0;
+}
+
+.stop.passed .stop-status{
+    background:#edf8f1;
+    color:#168447;
+}
+
+.stop-occupancy{
+    margin-top:6px;
+    font-size:11px;
+    color:#718096;
+}
+
+/* CURRENT JOURNEY */
+
+.journey-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+}
+
+.info{
+    background:#f7f9fc;
+    border-radius:12px;
+    padding:16px;
+}
+
+.info-label{
+    font-size:12px;
+    color:#718096;
+    margin-bottom:7px;
+}
+
+.info-value{
+    font-size:16px;
+    font-weight:800;
+}
+
+.main-status{
+    margin-top:18px;
+    background:#e9f2ff;
+    color:#1769e0;
+    border-radius:12px;
+    padding:16px;
+    text-align:center;
+    font-size:15px;
+    font-weight:700;
+}
+
+.completed{
+    background:#e9f8ef;
+    color:#168447;
+}
+
+.footer{
+    text-align:center;
+    color:#8a94a6;
+    font-size:12px;
+    padding:20px;
+}
+
+@media(max-width:700px){
+
+    .header{
+        padding:18px 5%;
+    }
+
+    .container{
+        width:92%;
+        margin-top:20px;
+    }
+
+    .occupancy-layout{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .stats{
+        width:100%;
+    }
+
+    .journey-grid{
+        grid-template-columns:1fr;
+    }
+
+    .schedule{
+        grid-template-columns:1fr;
+    }
+
+    .arrow{
+        text-align:center;
+        transform:rotate(90deg);
+    }
+}
+</style>
+</head>
+
+
+<body>
+
+<header class="header">
+
+    <div>
+        <div class="logo">SmartBus AI</div>
+        <div class="tagline">Know Before You Board</div>
+    </div>
+
+    <div class="live-badge">
+        ● LIVE TRACKING
+    </div>
+
+</header>
+
+
+<main class="container">
+
+<!-- BUS INFORMATION -->
+
+<section class="card">
+
+    <div class="bus-label">LIVE BUS</div>
+
+    <div>
+        <span class="bus-number" id="busNumber">SB003</span>
+        <span class="bus-type" id="busType">EXPRESS</span>
+    </div>
+
+    <div class="route" id="route">
+        Kakinada Complex → Surampalem Complex
+    </div>
+
+    <div class="schedule">
+
+        <div class="schedule-box">
+            <div class="small-label">DEPARTURE</div>
+            <div class="time" id="departureTime">08:30 AM</div>
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="schedule-box">
+            <div class="small-label">EXPECTED ARRIVAL</div>
+            <div class="time" id="arrivalTime">09:30 AM</div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- OCCUPANCY -->
+
+<section class="card">
+
+    <div class="title">Bus Occupancy</div>
+
+    <div class="occupancy-layout">
+
+        <div class="circle" id="occupancyCircle">
+
+            <div class="circle-inner">
+
+                <div class="percent" id="occupancyPercent">
+                    0%
+                </div>
+
+                <div class="occupied-text">
+                    Occupied
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="stats">
+
+            <div class="stat">
+                <div class="stat-label">Seat Capacity</div>
+                <div class="stat-value">50</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Passengers</div>
+                <div class="stat-value" id="passengers">0</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Seats Available</div>
+                <div class="stat-value" id="seatsAvailable">50</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Seated</div>
+                <div class="stat-value" id="seated">0</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Standing</div>
+                <div class="stat-value" id="standing">0</div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- JOURNEY STOPS -->
+
+<section class="card">
+
+    <div class="title">Journey Stops</div>
+
+    <div class="timeline" id="timeline">
+
+        <div class="progress-line" id="progressLine"></div>
+
+        <div class="moving-bus" id="movingBus">
+            🚌
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CURRENT JOURNEY -->
+
+<section class="card">
+
+    <div class="title">Current Journey</div>
+
+    <div class="journey-grid">
+
+        <div class="info">
+            <div class="info-label">Current Stop</div>
+            <div class="info-value" id="currentStop">-</div>
+        </div>
+
+        <div class="info">
+            <div class="info-label">Expected Arrival</div>
+            <div class="info-value" id="expectedArrival">-</div>
+        </div>
+
+        <div class="info">
+            <div class="info-label">Journey Status</div>
+            <div class="info-value" id="journeyStatus">-</div>
+        </div>
+
+    </div>
+
+    <div class="main-status" id="mainStatus">
+        🚌 Preparing live journey...
+    </div>
+
+</section>
+
+</main>
+
+
+<footer class="footer">
+    SmartBus AI • AI-Powered Live Bus Occupancy, Location & ETA System
+</footer>
+
+
+<script>
+
+/* =========================================================
+   GET BUS + ROUTE FROM URL
+========================================================= */
+
+const params = new URLSearchParams(window.location.search);
+
+const busId = params.get("bus") || "SB003";
+
+const routeId = params.get("route") || "KKD-SUR";
+
+
+/* =========================================================
+   ROUTES
+========================================================= */
+
+const routes = {
+
+    "KKD-SUR":{
+        name:"Kakinada Complex → Surampalem Complex",
+        stops:[
+            "Kakinada Complex",
+            "Sarpavaram Junction",
+            "Samalkota",
+            "Peddapuram",
+            "Surampalem Complex"
+        ]
+    },
+
+    "SUR-KKD":{
+        name:"Surampalem Complex → Kakinada Complex",
+        stops:[
+            "Surampalem Complex",
+            "Peddapuram",
+            "Samalkota",
+            "Sarpavaram Junction",
+            "Kakinada Complex"
+        ]
+    },
+
+    "KKD-RJY":{
+        name:"Kakinada Complex → Rajahmundry Complex",
+        stops:[
+            "Kakinada Complex",
+            "Samalkota",
+            "Anaparthi",
+            "Biccavolu",
+            "Dwarapudi",
+            "Rajahmundry Complex"
+        ]
+    },
+
+    "RJY-KKD":{
+        name:"Rajahmundry Complex → Kakinada Complex",
+        stops:[
+            "Rajahmundry Complex",
+            "Dwarapudi",
+            "Biccavolu",
+            "Anaparthi",
+            "Samalkota",
+            "Kakinada Complex"
+        ]
+    },
+
+    "KKD-AML":{
+        name:"Kakinada Complex → Amalapuram",
+        stops:[
+            "Kakinada Complex",
+            "Ramachandrapuram",
+            "Yanam",
+            "Amalapuram"
+        ]
+    },
+
+    "AML-KKD":{
+        name:"Amalapuram → Kakinada Complex",
+        stops:[
+            "Amalapuram",
+            "Yanam",
+            "Ramachandrapuram",
+            "Kakinada Complex"
+        ]
+    },
+
+    "KKD-KOR":{
+        name:"Kakinada Complex → Koripalli",
+        stops:[
+            "Kakinada Complex",
+            "Draksharamam",
+            "Ramachandrapuram",
+            "Koripalli"
+        ]
+    }
+
+};
+
+
+/* =========================================================
+   BUS SCHEDULES
+========================================================= */
+
+const schedules = {
+
+    SB001:["05:30 AM","06:40 AM","PALLEVELUGU"],
+    SB002:["07:00 AM","08:10 AM","ULTRA PALLEVELUGU"],
+    SB003:["08:30 AM","09:30 AM","EXPRESS"],
+    SB004:["10:00 AM","11:15 AM","PALLEVELUGU"],
+    SB005:["12:00 PM","01:10 PM","ULTRA PALLEVELUGU"],
+    SB006:["02:30 PM","03:30 PM","EXPRESS"],
+    SB007:["04:30 PM","05:45 PM","PALLEVELUGU"],
+    SB008:["06:30 PM","07:30 PM","EXPRESS"],
+    SB009:["08:00 PM","09:15 PM","PALLEVELUGU"],
+    SB010:["09:30 PM","10:30 PM","EXPRESS"],
+
+    SB101:["05:45 AM","06:55 AM","PALLEVELUGU"],
+    SB102:["07:30 AM","08:30 AM","EXPRESS"],
+    SB103:["09:00 AM","10:10 AM","ULTRA PALLEVELUGU"],
+    SB104:["11:00 AM","12:15 PM","PALLEVELUGU"],
+    SB105:["01:30 PM","02:30 PM","EXPRESS"],
+    SB106:["03:30 PM","04:45 PM","PALLEVELUGU"],
+    SB107:["05:30 PM","06:30 PM","EXPRESS"],
+    SB108:["07:30 PM","08:45 PM","PALLEVELUGU"],
+    SB109:["09:00 PM","10:00 PM","EXPRESS"],
+
+    SB201:["05:00 AM","06:45 AM","ULTRA PALLEVELUGU"],
+    SB202:["06:30 AM","08:00 AM","EXPRESS"],
+    SB203:["08:00 AM","09:50 AM","PALLEVELUGU"],
+    SB204:["09:30 AM","11:00 AM","EXPRESS"],
+    SB205:["11:00 AM","12:40 PM","ULTRA PALLEVELUGU"],
+    SB206:["01:00 PM","02:30 PM","EXPRESS"],
+    SB207:["03:00 PM","04:45 PM","PALLEVELUGU"],
+    SB208:["05:00 PM","06:30 PM","EXPRESS"],
+    SB209:["07:00 PM","08:40 PM","ULTRA PALLEVELUGU"],
+    SB210:["09:00 PM","10:30 PM","EXPRESS"],
+
+    SB301:["05:15 AM","06:45 AM","EXPRESS"],
+    SB302:["06:45 AM","08:30 AM","PALLEVELUGU"],
+    SB303:["08:15 AM","10:00 AM","ULTRA PALLEVELUGU"],
+    SB304:["10:00 AM","11:30 AM","EXPRESS"],
+    SB305:["12:00 PM","01:45 PM","PALLEVELUGU"],
+    SB306:["02:00 PM","03:30 PM","EXPRESS"],
+    SB307:["04:00 PM","05:45 PM","ULTRA PALLEVELUGU"],
+    SB308:["06:00 PM","07:30 PM","EXPRESS"],
+    SB309:["08:00 PM","09:45 PM","PALLEVELUGU"],
+
+    SB401:["05:30 AM","07:15 AM","PALLEVELUGU"],
+    SB402:["07:00 AM","08:40 AM","ULTRA PALLEVELUGU"],
+    SB403:["09:00 AM","10:30 AM","EXPRESS"],
+    SB404:["11:00 AM","12:40 PM","PALLEVELUGU"],
+    SB405:["01:30 PM","03:00 PM","EXPRESS"],
+    SB406:["04:00 PM","05:40 PM","ULTRA PALLEVELUGU"],
+    SB407:["06:30 PM","08:00 PM","EXPRESS"],
+    SB408:["08:30 PM","10:00 PM","PALLEVELUGU"],
+
+    SB501:["05:45 AM","07:30 AM","PALLEVELUGU"],
+    SB502:["07:30 AM","09:00 AM","EXPRESS"],
+    SB503:["09:30 AM","11:00 AM","ULTRA PALLEVELUGU"],
+    SB504:["12:00 PM","01:45 PM","PALLEVELUGU"],
+    SB505:["02:30 PM","04:00 PM","EXPRESS"],
+    SB506:["04:30 PM","06:00 PM","ULTRA PALLEVELUGU"],
+    SB507:["06:30 PM","08:00 PM","EXPRESS"],
+    SB508:["08:30 PM","10:00 PM","PALLEVELUGU"],
+
+    SB601:["06:00 AM","07:30 AM","ULTRA PALLEVELUGU"],
+    SB602:["08:00 AM","09:30 AM","PALLEVELUGU"],
+    SB603:["10:00 AM","11:20 AM","EXPRESS"],
+    SB604:["01:00 PM","02:30 PM","PALLEVELUGU"],
+    SB605:["03:30 PM","05:00 PM","EXPRESS"],
+    SB606:["06:00 PM","07:30 PM","ULTRA PALLEVELUGU"],
+    SB607:["08:30 PM","10:00 PM","PALLEVELUGU"]
+
+};
+
+
+/* =========================================================
+   SELECT DATA
+========================================================= */
+
+const route = routes[routeId] || routes["KKD-SUR"];
+
+const schedule = schedules[busId] ||
+    ["08:30 AM","09:30 AM","EXPRESS"];
+
+
+/* =========================================================
+   BASIC DETAILS
+========================================================= */
+
+document.getElementById("busNumber").textContent = busId;
+
+document.getElementById("busType").textContent = schedule[2];
+
+document.getElementById("route").textContent = route.name;
+
+document.getElementById("departureTime").textContent = schedule[0];
+
+document.getElementById("arrivalTime").textContent = schedule[1];
+
+
+/* =========================================================
+   TIME FUNCTIONS
+========================================================= */
+
+function toMinutes(time){
+
+    const parts = time.split(" ");
+
+    const hm = parts[0].split(":");
+
+    let hour = Number(hm[0]);
+
+    const minute = Number(hm[1]);
+
+    if(parts[1] === "PM" && hour !== 12){
+        hour += 12;
+    }
+
+    if(parts[1] === "AM" && hour === 12){
+        hour = 0;
+    }
+
+    return hour * 60 + minute;
+}
+
+
+function toTime(minutes){
+
+    minutes = ((minutes % 1440) + 1440) % 1440;
+
+    let hour = Math.floor(minutes / 60);
+
+    const minute = minutes % 60;
+
+    const period = hour >= 12 ? "PM" : "AM";
+
+    if(hour === 0){
+        hour = 12;
+    }
+    else if(hour > 12){
+        hour -= 12;
+    }
+
+    return String(hour).padStart(2,"0") +
+        ":" +
+        String(minute).padStart(2,"0") +
+        " " +
+        period;
+}
+
+
+/* =========================================================
+   STOP EXPECTED TIMES
+========================================================= */
+
+const startMinutes = toMinutes(schedule[0]);
+
+const endMinutes = toMinutes(schedule[1]);
+
+const stopCount = route.stops.length;
+
+const stopTimes = [];
+
+for(let i=0;i<stopCount;i++){
+
+    if(i === 0){
+
+        stopTimes.push(schedule[0]);
+
+    }
+    else if(i === stopCount - 1){
+
+        stopTimes.push(schedule[1]);
+
+    }
+    else{
+
+        const time =
+            startMinutes +
+            (
+                (endMinutes - startMinutes) *
+                i /
+                (stopCount - 1)
+            );
+
+        stopTimes.push(
+            toTime(Math.round(time))
+        );
+    }
+}
+
+
+/* =========================================================
+   CORRECT PASSENGER FLOW
+========================================================= */
+
+/*
+    VERY IMPORTANT:
+
+    Seats = 50
+
+    Passenger <= 50
+    => Standing = 0
+
+    Passenger > 50
+    => First 50 seated
+    => Remaining standing
+
+    So:
+
+    35 => 35 seated + 0 standing
+    48 => 48 seated + 0 standing
+    50 => 50 seated + 0 standing
+    55 => 50 seated + 5 standing
+    62 => 50 seated + 12 standing
+    70 => 50 seated + 20 standing
+*/
+
+function makePassengerFlow(count){
+
+    const patterns = [
+
+        35,
+        48,
+        50,
+        55,
+        62,
+        70,
+        58,
+        45
+
+    ];
+
+    const result = [];
+
+    for(let i=0;i<count;i++){
+
+        if(i === count - 1){
+
+            result.push(0);
+
+        }
+        else{
+
+            result.push(
+                patterns[i % patterns.length]
+            );
+
+        }
+
+    }
+
+    return result;
+}
+
+
+const passengerFlow =
+    makePassengerFlow(stopCount);
+
+
+/* =========================================================
+   CREATE JOURNEY STOPS
+========================================================= */
+
+const timeline =
+    document.getElementById("timeline");
+
+route.stops.forEach((stopName,index)=>{
+
+    const passengerCount =
+        passengerFlow[index];
+
+    const seated =
+        Math.min(passengerCount,50);
+
+    const standing =
+        Math.max(
+            0,
+            Math.min(
+                passengerCount - 50,
+                20
+            )
+        );
+
+
+    const stop =
+        document.createElement("div");
+
+    stop.className = "stop";
+
+    if(index === 0){
+        stop.classList.add("current");
+    }
+
+
+    stop.innerHTML = `
+
+        <div class="dot"></div>
+
+        <div class="stop-name">
+            ${stopName}
+        </div>
+
+        <div class="stop-time">
+            ${
+                index === 0
+                ? "Departure: "
+                : "Expected: "
+            }
+            ${stopTimes[index]}
+        </div>
+
+        <div class="stop-status">
+            ${
+                index === 0
+                ? "Bus is here"
+                : "Upcoming"
+            }
+        </div>
+
+        <div class="stop-occupancy">
+            👥 ${passengerCount} passengers
+            • ${seated} seated
+            • ${standing} standing
+        </div>
+
+    `;
+
+    timeline.appendChild(stop);
+
+});
+
+
+const stops =
+    document.querySelectorAll(".stop");
+
+
+/* =========================================================
+   OCCUPANCY UPDATE
+========================================================= */
+
+function updateOccupancy(passengerCount){
+
+    /*
+       FIRST 50 ARE SEATED.
+
+       ONLY AFTER 50:
+       standing starts.
+    */
+
+    const seated =
+        Math.min(passengerCount,50);
+
+    const standing =
+        Math.min(
+            Math.max(
+                passengerCount - 50,
+                0
+            ),
+            20
+        );
+
+
+    const seatsAvailable =
+        Math.max(
+            50 - seated,
+            0
+        );
+
+
+    /*
+       50 seats = 80%
+
+       20 standing = 20%
+
+       Total = 100%
+    */
+
+    const seatedPercentage =
+        (seated / 50) * 80;
+
+    const standingPercentage =
+        (standing / 20) * 20;
+
+    const percentage =
+        Math.min(
+            100,
+            Math.round(
+                seatedPercentage +
+                standingPercentage
+            )
+        );
+
+
+    document.getElementById("passengers")
+        .textContent = passengerCount;
+
+    document.getElementById("seated")
+        .textContent = seated;
+
+    document.getElementById("standing")
+        .textContent = standing;
+
+    document.getElementById("seatsAvailable")
+        .textContent = seatsAvailable;
+
+    document.getElementById("occupancyPercent")
+        .textContent = percentage + "%";
+
+
+    let ringColor = "#22c55e";
+
+    if(percentage >= 100){
+
+        ringColor = "#ef4444";
+
+    }
+    else if(percentage >= 70){
+
+        ringColor = "#f59e0b";
+
+    }
+
+
+    const degree =
+        percentage * 3.6;
+
+
+    document.getElementById("occupancyCircle")
+        .style.background =
+        `conic-gradient(
+            ${ringColor} ${degree}deg,
+            #e8edf3 ${degree}deg
+        )`;
+}
+
+
+/* =========================================================
+   UPDATE STOP STATUS
+========================================================= */
+
+function updateStops(index){
+
+    stops.forEach((stop,i)=>{
+
+        const status =
+            stop.querySelector(".stop-status");
+
+        const time =
+            stop.querySelector(".stop-time");
+
+
+        stop.classList.remove(
+            "current",
+            "passed"
+        );
+
+
+        if(i < index){
+
+            stop.classList.add("passed");
+
+            status.textContent =
+                "Departed";
+
+            time.textContent =
+                "Departed: " +
+                stopTimes[i];
+
+        }
+
+        else if(i === index){
+
+            stop.classList.add("current");
+
+            status.textContent =
+                "Bus is here";
+
+            time.textContent =
+                "Arrival: " +
+                stopTimes[i];
+
+        }
+
+        else{
+
+            status.textContent =
+                "Upcoming";
+
+            time.textContent =
+                "Expected: " +
+                stopTimes[i];
+
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+   MOVE BUS
+========================================================= */
+
+function moveBus(index){
+
+    const stop = stops[index];
+
+    if(!stop){
+        return;
+    }
+
+    const top =
+        stop.offsetTop + 3;
+
+    document.getElementById("movingBus")
+        .style.top =
+        top + "px";
+
+
+    const lineHeight =
+        stop.offsetTop + 17 - 15;
+
+    document.getElementById("progressLine")
+        .style.height =
+        Math.max(0,lineHeight) + "px";
+}
+
+
+/* =========================================================
+   ARRIVAL
+========================================================= */
+
+function arriveAtStop(index){
+
+    currentIndex = index;
+
+    updateStops(index);
+
+    updateOccupancy(
+        passengerFlow[index]
+    );
+
+    document.getElementById("currentStop")
+        .textContent =
+        route.stops[index];
+
+
+    if(index === stopCount - 1){
+
+        document.getElementById("expectedArrival")
+            .textContent =
+            "Arrived " + stopTimes[index];
+
+        document.getElementById("journeyStatus")
+            .textContent =
+            "Completed";
+
+        document.getElementById("mainStatus")
+            .textContent =
+            "🏁 Trip Completed • All passengers got down";
+
+        document.getElementById("mainStatus")
+            .classList.add("completed");
+
+        return;
+    }
+
+
+    document.getElementById("expectedArrival")
+        .textContent =
+        stopTimes[index + 1];
+
+
+    document.getElementById("journeyStatus")
+        .textContent =
+        "Bus is here";
+
+
+    document.getElementById("mainStatus")
+        .textContent =
+        "🚌 Bus is here at " +
+        route.stops[index] +
+        " • Next stop: " +
+        route.stops[index + 1] +
+        " • Expected " +
+        stopTimes[index + 1];
+
+}
+
+
+/* =========================================================
+   START MOVEMENT
+========================================================= */
+
+let currentIndex = 0;
+
+
+/* Initial */
+
+moveBus(0);
+
+arriveAtStop(0);
+
+
+/* =========================================================
+   NEXT STOP
+========================================================= */
+
+function moveNext(){
+
+    if(currentIndex >= stopCount - 1){
+        return;
+    }
+
+
+    const nextIndex =
+        currentIndex + 1;
+
+
+    /*
+       Current stop becomes departed.
+    */
+
+    stops[currentIndex]
+        .classList.remove("current");
+
+    stops[currentIndex]
+        .classList.add("passed");
+
+
+    stops[currentIndex]
+        .querySelector(".stop-status")
+        .textContent =
+        "Departed";
+
+
+    stops[currentIndex]
+        .querySelector(".stop-time")
+        .textContent =
+        "Departed: " +
+        stopTimes[currentIndex];
+
+
+    /*
+       Show NEXT expected time while moving.
+    */
+
+    document.getElementById("currentStop")
+        .textContent =
+        "En route";
+
+
+    document.getElementById("expectedArrival")
+        .textContent =
+        stopTimes[nextIndex];
+
+
+    document.getElementById("journeyStatus")
+        .textContent =
+        "En route";
+
+
+    document.getElementById("mainStatus")
+        .textContent =
+        "🚌 Moving to " +
+        route.stops[nextIndex] +
+        " • Expected " +
+        stopTimes[nextIndex];
+
+
+    /*
+       Move bus slowly.
+    */
+
+    moveBus(nextIndex);
+
+
+    /*
+       Arrive after 12 seconds.
+    */
+
+    setTimeout(()=>{
+
+        arriveAtStop(nextIndex);
+
+
+        /*
+           Stay at stop for 3 sec,
+           then move again.
+        */
+
+        if(currentIndex < stopCount - 1){
+
+            setTimeout(
+                moveNext,
+                3000
+            );
+
+        }
+
+    },12000);
+
+}
+
+
+/* =========================================================
+   START AFTER FIRST STOP
+========================================================= */
+
+setTimeout(
+    moveNext,
+    3000
+);
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    ()=>{
+
+        document.getElementById("movingBus")
+            .style.transition = "none";
+
+        document.getElementById("progressLine")
+            .style.transition = "none";
+
+
+        moveBus(currentIndex);
+
+
+        setTimeout(()=>{
+
+            document.getElementById("movingBus")
+                .style.transition =
+                "top 12s linear";
+
+            document.getElementById("progressLine")
+                .style.transition =
+                "height 12s linear";
+
+        },100);
+
+    }
+);
+
+</script>
+
+</body>
+</html>

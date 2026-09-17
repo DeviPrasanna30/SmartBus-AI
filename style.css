@@ -1,0 +1,528 @@
+/* =========================================================
+   SMARTBUS AI - HOME PAGE STYLE
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #ffffff;
+    color: #172033;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+header,
+.navbar,
+nav {
+    width: 100%;
+}
+
+header {
+    height: 82px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 9%;
+    border-bottom: 1px solid #e8edf5;
+    background: #ffffff;
+}
+
+header .logo,
+.logo {
+    font-size: 25px;
+    font-weight: 800;
+    color: #2166f3;
+    text-decoration: none;
+}
+
+header nav,
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+header nav a,
+.nav-links a {
+    color: #172033;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+header nav a:hover,
+.nav-links a:hover {
+    color: #2166f3;
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero,
+.hero-section {
+    min-height: 415px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 70px 10%;
+    gap: 60px;
+    background: #ffffff;
+}
+
+.hero-left,
+.hero-content {
+    flex: 1;
+    max-width: 650px;
+}
+
+.hero-right,
+.hero-search {
+    width: 390px;
+    flex-shrink: 0;
+}
+
+/* Small top text */
+
+.hero-small,
+.hero-label,
+.eyebrow {
+    color: #2166f3;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+/* Main heading */
+
+.hero h1 {
+    font-size: 54px;
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+    color: #172033;
+    margin-bottom: 20px;
+    font-weight: 800;
+}
+
+.hero p {
+    font-size: 17px;
+    color: #536174;
+    max-width: 650px;
+}
+
+/* =========================================================
+   SEARCH CARD
+   ========================================================= */
+
+.search-card,
+.track-card,
+.search-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 27px;
+    box-shadow: 0 12px 35px rgba(28, 52, 84, 0.10);
+}
+
+.search-card h2,
+.track-card h2,
+.search-box h2 {
+    font-size: 24px;
+    color: #172033;
+    margin-bottom: 4px;
+}
+
+.search-card p,
+.track-card p,
+.search-box p {
+    color: #667085;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-group label,
+.search-card label,
+.track-card label,
+.search-box label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #344054;
+    margin-bottom: 6px;
+}
+
+.input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+input[type="text"],
+input[type="search"] {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid #d0d5dd;
+    border-radius: 9px;
+    outline: none;
+    font-size: 14px;
+    color: #172033;
+    background: #ffffff;
+    transition: 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="search"]:focus {
+    border-color: #2166f3;
+    box-shadow: 0 0 0 3px rgba(33, 102, 243, 0.10);
+}
+
+input::placeholder {
+    color: #98a2b3;
+}
+
+/* =========================================================
+   SWAP BUTTON
+   ========================================================= */
+
+#swapBtn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 1px solid #d9e1ec;
+    background: #ffffff;
+    color: #2166f3;
+    font-size: 17px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: -4px auto 8px auto;
+    transition: 0.2s ease;
+}
+
+#swapBtn:hover {
+    background: #eef4ff;
+    border-color: #2166f3;
+    transform: rotate(180deg);
+}
+
+/* =========================================================
+   AUTOCOMPLETE DROPDOWN
+   ========================================================= */
+
+.station-dropdown {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+
+    background: #ffffff;
+    border: 1px solid #dfe5ee;
+    border-radius: 10px;
+
+    max-height: 260px;
+    overflow-y: auto;
+
+    z-index: 99999;
+    display: none;
+
+    box-shadow: 0 12px 30px rgba(23, 32, 51, 0.14);
+}
+
+.station-option {
+    width: 100%;
+    padding: 12px 15px;
+
+    background: #ffffff;
+    color: #172033;
+
+    font-size: 14px;
+    text-align: left;
+
+    cursor: pointer;
+    border-bottom: 1px solid #eef1f5;
+
+    transition: 0.15s ease;
+}
+
+.station-option:last-child {
+    border-bottom: none;
+}
+
+.station-option:hover {
+    background: #f3f7ff;
+    color: #2166f3;
+}
+
+/* Scrollbar */
+
+.station-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.station-dropdown::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* =========================================================
+   TRACK BUS BUTTON
+   ========================================================= */
+
+#trackBusBtn,
+.track-btn,
+button[type="submit"] {
+    width: 100%;
+    height: 46px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #2166f3;
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+#trackBusBtn:hover,
+.track-btn:hover,
+button[type="submit"]:hover {
+    background: #1554d1;
+    transform: translateY(-1px);
+}
+
+#trackBusBtn:active,
+.track-btn:active,
+button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+/* =========================================================
+   POPULAR ROUTES SECTION
+   ========================================================= */
+
+.popular-routes,
+.routes-section {
+    width: 100%;
+    background: #f5f7fb;
+    padding: 48px 10% 60px;
+}
+
+.section-label {
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.popular-routes h2,
+.routes-section h2 {
+    font-size: 27px;
+    color: #172033;
+    margin-bottom: 25px;
+}
+
+/* =========================================================
+   ROUTE CARDS
+   ========================================================= */
+
+.route-grid,
+.routes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.route-card {
+    background: #ffffff;
+    border: 1px solid #e4e9f1;
+    border-radius: 14px;
+    padding: 22px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.route-card:hover {
+    border-color: #2166f3;
+    box-shadow: 0 8px 25px rgba(33, 102, 243, 0.10);
+    transform: translateY(-2px);
+}
+
+.route-card h3 {
+    color: #172033;
+    font-size: 18px;
+    margin-bottom: 7px;
+}
+
+.route-card p {
+    color: #667085;
+    font-size: 14px;
+}
+
+/* =========================================================
+   FEATURES
+   ========================================================= */
+
+.features,
+.features-section {
+    padding: 65px 10%;
+    background: #ffffff;
+}
+
+.features h2,
+.features-section h2 {
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 35px;
+    color: #172033;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.feature-card {
+    padding: 25px;
+    border: 1px solid #e5eaf1;
+    border-radius: 15px;
+    background: #ffffff;
+}
+
+.feature-card h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #172033;
+}
+
+.feature-card p {
+    color: #667085;
+    font-size: 14px;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+footer {
+    background: #172033;
+    color: #ffffff;
+    padding: 28px 10%;
+    text-align: center;
+}
+
+footer p {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    header {
+        padding: 0 5%;
+    }
+
+    .hero,
+    .hero-section {
+        padding: 55px 6%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hero-right,
+    .hero-search {
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .hero h1 {
+        font-size: 44px;
+    }
+
+    .popular-routes,
+    .routes-section,
+    .features,
+    .features-section {
+        padding-left: 6%;
+        padding-right: 6%;
+    }
+}
+
+@media (max-width: 650px) {
+
+    header {
+        height: auto;
+        min-height: 70px;
+        padding: 16px 5%;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    header nav,
+    .nav-links {
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .hero,
+    .hero-section {
+        padding: 45px 5%;
+    }
+
+    .hero h1 {
+        font-size: 38px;
+    }
+
+    .hero p {
+        font-size: 15px;
+    }
+
+    .route-grid,
+    .routes-grid,
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .popular-routes,
+    .routes-section,
+    .features,
+    .features-section {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+}
